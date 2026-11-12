@@ -1,0 +1,27 @@
+[gd_scene format=3 uid="uid://cwieblvhhgyc3"]
+
+[ext_resource type="PackedScene" uid="uid://xm3tde032do5" path="res://scenes/player.tscn" id="1_1kc1q"]
+[ext_resource type="PackedScene" uid="uid://dcsq5meq6fplu" path="res://resources/apartment_baked/apartment__baked.glb" id="1_ulcgi"]
+[ext_resource type="PackedScene" uid="uid://bk2ogo5xb7kla" path="res://scenes/Door.tscn" id="3_4msxo"]
+
+[node name="Node3D" type="Node3D" unique_id=743209400]
+
+[node name="CharacterBody3D" parent="." unique_id=4254125 instance=ExtResource("1_1kc1q")]
+MouseSensitivity = 0.006
+
+[node name="Apartment" type="Node3D" parent="." unique_id=231299832]
+
+[node name="Sketchfab_Scene" parent="Apartment" unique_id=1365537174 instance=ExtResource("1_ulcgi")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.708248, -0.073009014, -1.6258364)
+
+[node name="Sketchfab_Scene2" parent="Apartment" unique_id=991430406 instance=ExtResource("1_ulcgi")]
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 7.1960726, -0.14601803, 8.514925)
+
+[node name="Door" parent="Apartment" unique_id=1234180736 instance=ExtResource("3_4msxo")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.467635, -0.1448721, 3.439405)
+
+[node name="Door2" parent="Apartment" unique_id=1925159137 instance=ExtResource("3_4msxo")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 7.620546, -0.13929346, 5.0956354)
+
+[node name="Door3" parent="Apartment" unique_id=1035501430 instance=ExtResource("3_4msxo")]
+transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.0202302, 0, 1, 0, -4.371139e-08, 5.299616, -0.08362535, 1.8285012)
