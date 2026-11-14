@@ -1,0 +1,170 @@
+@startuml classes
+title Полная диаграмма классов learning-project-4
+skinparam classAttributeIconSize 0
+hide empty members
+top to bottom direction
+interface IInteractable {
+  +void Interact()
+}
+interface IReadable {
+  +void OpenText()
+  +void CloseText()
+}
+interface ICollectible {
+  +ItemId : string
+  +void Collect()
+}
+interface IDamageable {
+  +void ReceiveDamage(float damage)
+  +void Die()
+}
+interface IReadingHost {
+  +bool ShowText(IReadable source, string text)
+  +void CollectItem(ICollectible item)
+}
+class Player {
+  -gravity : float
+  -Speed : float
+  -MouseSensitivity : float
+  -Inventory : Array<string>
+  -AttackDamage : float
+  -_camera : Camera3D
+  -_rayCast : RayCast3D
+  -_interactionLabel : Label
+  -_targetNode : Node
+  -_target : IInteractable
+  -_readingPanel : ReadingPanel
+  -_notesLabel : Label
+  -_readingSource : IReadable
+  -_isReading : bool
+  +void _Ready()
+  +void _PhysicsProcess(double delta)
+  +void _Process(double delta)
+  -void UpdateInteractionTarget()
+  +void _Input(InputEvent event)
+  +bool ShowText(IReadable source, string text)
+  -void CloseReading()
+  +void CollectItem(ICollectible item)
+}
+class ReadingPanel {
+  +CloseRequested : Action
+  +void _Ready()
+  +void ShowText(string text)
+}
+class Book {
+  +Text : string
+  +void Interact()
+  +void OpenText()
+  +void CloseText()
+}
+class Note {
+  +ItemId : string
+  +Text : string
+  -_host : IReadingHost
+  -_reading : bool
+  -_collected : bool
+  +void Interact()
+  +void OpenText()
+  +void CloseText()
+  +void Collect()
+}
+class Chair {
+  +MaxHealth : float
+  -_health : float
+  +void _Ready()
+  +void Interact()
+  +void ReceiveDamage(float damage)
+  +void Die()
+}
+class Door {
+  +MaxHealth : float
+  +AutoCloseAfterPassage : bool
+  +AutoCloseDelay : float
+  +LockAfterAutoClose : bool
+  +IsLocked : bool
+  -_lockOnAnimationFinished : bool
+  -_passageArea : Area3D
+  -_entrySides : Dictionary<Player,float>
+  -_closePending : bool
+  -_closeCountdown : double
+  -_health : float
+  -_isOpen : bool
+  -_destroyed : bool
+  -_animationPlayer : AnimationPlayer
+  +void _Ready()
+  +void Interact()
+  -void OnPassageEntered(Node3D body)
+  -void OnPassageExited(Node3D body)
+  +void _PhysicsProcess(double delta)
+  -void OnAnimationFinished(StringName animation)
+  +void ReceiveDamage(float damage)
+  +void Die()
+}
+class ObjectSound <<static>> {
+  {static} +void Hit(Node3D source)
+  {static} +void Break(Node3D source)
+  {static} -void Play(Node3D source, string path)
+}
+class DestructionEffect {
+  -_shards : List<ShardTuple>
+  -_age : float
+  -Lifetime : float
+  {static} +void Spawn(Node3D source)
+  {static} -void CollectMeshes(Node node, List<MeshInstance3D> meshes)
+  +void _Process(double delta)
+}
+class ApartmentImport <<tool script>> {
+  +Object _post_import(Node scene)
+}
+class Node <<Godot>> {
+}
+class Node3D <<Godot>> {
+}
+class CharacterBody3D <<Godot>> {
+}
+class StaticBody3D <<Godot>> {
+}
+class Area3D <<Godot>> {
+}
+class CanvasLayer <<Godot>> {
+}
+class EditorScenePostImport <<Godot>> {
+}
+IInteractable <|-- IReadable
+IInteractable <|-- ICollectible
+IInteractable <|-- IDamageable
+IReadingHost <|.. Player
+IReadable <|.. Book
+IReadable <|.. Note
+ICollectible <|.. Note
+IDamageable <|.. Door
+IDamageable <|.. Chair
+Node <|-- Node3D : indirectly
+Node <|-- CanvasLayer
+Node3D <|-- CharacterBody3D : indirectly
+Node3D <|-- StaticBody3D : indirectly
+Node3D <|-- Area3D : indirectly
+CharacterBody3D <|-- Player
+StaticBody3D <|-- Book
+StaticBody3D <|-- Chair
+Area3D <|-- Note
+Node3D <|-- Door
+Node3D <|-- DestructionEffect
+CanvasLayer <|-- ReadingPanel
+EditorScenePostImport <|-- ApartmentImport
+Player "1" *-- "1" ReadingPanel : creates child
+Player --> "0..1" IInteractable : _target
+Player --> "0..1" IReadable : _readingSource
+Player ..> ICollectible : CollectItem
+Player ..> IDamageable : attack
+Player ..> Door : IsLocked hint
+Book ..> IReadingHost : reading_host group lookup
+Note --> "0..1" IReadingHost : _host
+Door --> "0..*" Player : _entrySides keys
+Door "1" *-- "1" Area3D : PassageArea
+Door ..> ObjectSound
+Chair ..> ObjectSound
+Door ..> DestructionEffect : Spawn hinge
+Chair ..> DestructionEffect : Spawn self
+
+@enduml
