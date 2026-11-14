@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://j3ey3336ogwf"]
+
+[ext_resource type="Script" uid="uid://bytj3b8gmpxsu" path="res://scripts/objects/Note.cs" id="1"]
+[ext_resource type="PackedScene" uid="uid://dwm6ryffsljb8" path="res://resources/note/Note.glb" id="2_tqwf5"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_yfr1v"]
+radius = 0.1899414
+height = 0.6547241
+
+[node name="Записка" type="Area3D" unique_id=1501668210]
+script = ExtResource("1")
+
+[node name="Sketchfab_Scene" parent="." unique_id=2019467949 instance=ExtResource("2_tqwf5")]
+transform = Transform3D(-0.003643478, 0.014468663, -0.17750894, 0.14749701, 0.03437909, 0, 0.03554784, -0.14116459, -0.018193776, 0.014259875, 0, 0.004134357)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=212811213]
+transform = Transform3D(1, 0, 0, 0, 0.028146083, -0.9996038, 0, 0.9996038, 0.028146083, 0, 0.07345304, 0.0177847)
+shape = SubResource("CapsuleShape3D_yfr1v")

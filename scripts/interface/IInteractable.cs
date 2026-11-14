@@ -1,9 +1,5 @@
-using Godot;
-using System;
-
-public interface IInteractable 
+/// <summary>Общий контракт взаимодействия с предметом.</summary>
+public interface IInteractable
 {
-    float Health;
-    void ReceiveDamage(){}
-    void Die() {}
+    void Interact();
 }

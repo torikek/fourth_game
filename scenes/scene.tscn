@@ -3,6 +3,14 @@
 [ext_resource type="PackedScene" uid="uid://xm3tde032do5" path="res://scenes/player.tscn" id="1_1kc1q"]
 [ext_resource type="PackedScene" uid="uid://dcsq5meq6fplu" path="res://resources/apartment_baked/apartment__baked.glb" id="1_ulcgi"]
 [ext_resource type="PackedScene" uid="uid://bk2ogo5xb7kla" path="res://scenes/Door.tscn" id="3_4msxo"]
+[ext_resource type="PackedScene" uid="uid://ck5mr2gejr3ps" path="res://scenes/Chair.tscn" id="4_chair"]
+[ext_resource type="PackedScene" uid="uid://dx2atgyq0jodc" path="res://scenes/Book.tscn" id="5_book"]
+[ext_resource type="PackedScene" uid="uid://j3ey3336ogwf" path="res://scenes/Note.tscn" id="6_note"]
+[ext_resource type="PackedScene" uid="uid://tnom78nort5x" path="res://scenes/Shkaf.tscn" id="7_7182s"]
+[ext_resource type="PackedScene" uid="uid://c88kqru31kari" path="res://scenes/Tumba.tscn" id="7_ruw3y"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_yfr1v"]
+size = Vector3(3.1044312, 0.14428711, 3.4978027)
 
 [node name="Node3D" type="Node3D" unique_id=743209400]
 
@@ -15,13 +23,78 @@ MouseSensitivity = 0.006
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.708248, -0.073009014, -1.6258364)
 
 [node name="Sketchfab_Scene2" parent="Apartment" unique_id=991430406 instance=ExtResource("1_ulcgi")]
-transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 7.1960726, -0.14601803, 8.514925)
+transform = Transform3D(-1, 0, 0, 0, 1, 0, 0, 0, -1, 7.1960726, -0.073009014, 8.514925)
+
+[node name="Area3D" type="Area3D" parent="Apartment" unique_id=2125527955]
+transform = Transform3D(-1, 0, 0, 0, -4.371139e-08, -1, 0, -1, 4.371139e-08, 9.309539, 1.1028833, 6.6215096)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Apartment/Area3D" unique_id=775713002]
+shape = SubResource("BoxShape3D_yfr1v")
 
 [node name="Door" parent="Apartment" unique_id=1234180736 instance=ExtResource("3_4msxo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.467635, -0.1448721, 3.439405)
+transform = Transform3D(1, 0, 0, 0, 1.0460005, 0, 0, 0, 1, 6.467635, -0.1448721, 3.439405)
+AutoCloseAfterPassage = true
+LockAfterAutoClose = true
 
 [node name="Door2" parent="Apartment" unique_id=1925159137 instance=ExtResource("3_4msxo")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1, 0, 1, 0, -4.371139e-08, 7.620546, -0.13929346, 5.0956354)
 
 [node name="Door3" parent="Apartment" unique_id=1035501430 instance=ExtResource("3_4msxo")]
 transform = Transform3D(-4.371139e-08, 0, -1, 0, 1.0202302, 0, 1, 0, -4.371139e-08, 5.299616, -0.08362535, 1.8285012)
+
+[node name="Стул" parent="Apartment" unique_id=1673588756 instance=ExtResource("4_chair")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.889647, -0.073, 2.418272)
+
+[node name="Стул2" parent="Apartment" unique_id=68837012 instance=ExtResource("4_chair")]
+transform = Transform3D(0.44232076, 0, 0.8968569, 0, 1, 0, -0.8968569, 0, 0.44232076, 10.070845, -0.073, 1.951668)
+
+[node name="Стул3" parent="Apartment" unique_id=1390246743 instance=ExtResource("4_chair")]
+transform = Transform3D(-0.9288596, 0, 0.37043208, 0, 1, 0, -0.37043208, 0, -0.9288596, 9.6071205, -0.073, 0.99451137)
+
+[node name="Книга_о_доме" parent="Apartment" unique_id=272786631 instance=ExtResource("5_book")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.901255, 0.507, 2.3)
+Text = "История дома
+
+В этой квартире каждый предмет хранит свою историю. Граф графа графини графа Драк-дарк-драко-дракулы жил здесь однажды
+
+[Книги можно читать повторно: они остаются на месте после закрытия текста]"
+
+[node name="Книга_о_предметах" parent="Apartment" unique_id=511046100 instance=ExtResource("5_book")]
+transform = Transform3D(-0.4573998, 0, 0.8892612, 0, 1, 0, -0.8892612, 0, -0.4573998, 7.1916404, 0.7294899, 2.3)
+Text = "Справочник предметов
+
+Дверь открывается клавишей E. Левой кнопкой мыши можно повредить дверь или стул. Разные предметы отвечают на одни и те же действия по-разному."
+
+[node name="Записка1" parent="Apartment" unique_id=117273054 instance=ExtResource("6_note")]
+transform = Transform3D(-0.99928623, 0, -0.03777526, 0, 1, 0, 0.03777526, 0, -0.99928623, 4.5958214, 0.9033772, -0.19231284)
+ItemId = "note_01"
+Text = "Записка №1
+
+Не знаю как я здесь оказался и не знаю как отсюда выбраться.
+
+[Закрой этот текст — записка попадёт в инвентарь, а число в левом верхнем углу увеличится]"
+
+[node name="Записка2" parent="Apartment" unique_id=248262777 instance=ExtResource("6_note")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7, -0.136, 4.2)
+ItemId = "note_02"
+Text = "Записка №2
+
+За мной следят. Я это знаю, но доказать не могу"
+
+[node name="Node3D" parent="Apartment" unique_id=1210016866 instance=ExtResource("7_7182s")]
+transform = Transform3D(0.5932855, 0, 0.80499214, 0, 1, 0, -0.80499214, 0, 0.5932855, 15.5119095, 0.43167448, 4.958253)
+
+[node name="Node3D2" parent="Apartment" unique_id=75538878 instance=ExtResource("7_7182s")]
+transform = Transform3D(0.037638992, 0, 0.99929136, 0, 1, 0, -0.99929136, 0, 0.037638992, 13.467727, 0.43167448, 6.60002)
+
+[node name="Node3D3" parent="Apartment" unique_id=1391177159 instance=ExtResource("7_7182s")]
+transform = Transform3D(-0.9988229, 0, -0.04850723, 0, 1, 0, 0.04850723, 0, -0.9988229, 11.622581, 0.43167448, 3.777854)
+
+[node name="Записка3" parent="Apartment" unique_id=1501668210 instance=ExtResource("6_note")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.401472, 0.48439658, 4.855821)
+Text = "Записка №3
+
+Я тут так долго хожу. Я хочу вкусно и точка понимаете?..."
+
+[node name="Node3D" parent="." unique_id=1191960443 instance=ExtResource("7_ruw3y")]
+transform = Transform3D(0.022554588, 0, -0.9997456, 0, 1, 0, 0.9997456, 0, 0.022554588, 7.040519, 0.05453548, 2.483921)
