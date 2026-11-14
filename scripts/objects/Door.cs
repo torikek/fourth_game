@@ -1,8 +1,9 @@
 using Godot;
 
-/// <summary>Дверь открывается одной анимацией и разрушается от урона.</summary>
+/// <summary>дверь открывается одной анимацией и разрушается от урона</summary>
 public partial class Door : Node3D, IDamageable
 {
+    // настраиваем прочность, автоматическое закрытие и последующее запирание
     [Export] public float MaxHealth { get; set; } = 50f;
     [Export] public bool AutoCloseAfterPassage { get; set; }
     [Export] public float AutoCloseDelay { get; set; } = 0.4f;
@@ -10,7 +11,9 @@ public partial class Door : Node3D, IDamageable
     public bool IsLocked { get; private set; }
     private bool _lockOnAnimationFinished;
     private Area3D _passageArea;
+    // запоминаем сторону входа каждого игрока, чтобы отличать проход от возврата
     private readonly System.Collections.Generic.Dictionary<Player, float> _entrySides = new();
+    // отслеживаем отложенное закрытие и текущее состояние двери
     private bool _closePending;
     private double _closeCountdown;
     private float _health;
@@ -18,6 +21,7 @@ public partial class Door : Node3D, IDamageable
     private bool _destroyed;
     private AnimationPlayer _animationPlayer;
 
+    // устанавливаем здоровье и подключаем события анимации и зоны прохода
     public override void _Ready()
     {
         _health = MaxHealth;
@@ -28,6 +32,7 @@ public partial class Door : Node3D, IDamageable
         _passageArea.BodyExited += OnPassageExited;
     }
 
+    // переключаем открытие и закрытие одной анимацией, если дверь доступна
     public void Interact()
     {
         if (_destroyed || IsLocked || _animationPlayer.IsPlaying()) return;
@@ -36,7 +41,7 @@ public partial class Door : Node3D, IDamageable
         if (_isOpen) _animationPlayer.PlayBackwards("Open");
         else _animationPlayer.Play("Open");
         _isOpen = !_isOpen;
-        // E can be pressed after the player has already entered the trigger.
+        // учитываем игрока, который вошёл в зону прохода ещё до открытия двери
         if (_isOpen && AutoCloseAfterPassage)
         {
             foreach (Node3D body in _passageArea.GetOverlappingBodies())
@@ -44,14 +49,16 @@ public partial class Door : Node3D, IDamageable
         }
     }
 
+    // фиксируем сторону входа относительно локальной оси двери
     private void OnPassageEntered(Node3D body)
     {
         if (!AutoCloseAfterPassage || _destroyed || !_isOpen || body is not Player player) return;
         _entrySides[player] = Mathf.Sign(ToLocal(player.GlobalPosition).Z);
-        // Returning to the doorway postpones a pending close.
+        // возвращение в проём сбрасывает задержку ожидающего закрытия
         _closeCountdown = AutoCloseDelay;
     }
 
+    // запускаем задержку закрытия только после выхода на противоположную сторону
     private void OnPassageExited(Node3D body)
     {
         if (body is not Player player || !_entrySides.Remove(player, out float entrySide)) return;
@@ -62,6 +69,7 @@ public partial class Door : Node3D, IDamageable
         _closeCountdown = AutoCloseDelay;
     }
 
+    // ждём освобождения проёма, окончания анимации и заданной задержки
     public override void _PhysicsProcess(double delta)
     {
         if (!_closePending || _destroyed || !_isOpen || !AutoCloseAfterPassage) return;
@@ -74,10 +82,12 @@ public partial class Door : Node3D, IDamageable
         if (_closeCountdown > 0) return;
         _closePending = false;
         _isOpen = false;
+        // откладываем запирание до полного завершения закрытия
         _lockOnAnimationFinished = LockAfterAutoClose;
         _animationPlayer.PlayBackwards("Open");
     }
 
+    // запираем дверь после завершения автоматического закрытия
     private void OnAnimationFinished(StringName animation)
     {
         if (animation != "Open" || !_lockOnAnimationFinished || _destroyed) return;
@@ -85,6 +95,7 @@ public partial class Door : Node3D, IDamageable
         IsLocked = true;
     }
 
+    // уменьшаем здоровье от положительного урона и проверяем разрушение
     public void ReceiveDamage(float damage)
     {
         if (_destroyed || damage <= 0) return;
@@ -93,6 +104,7 @@ public partial class Door : Node3D, IDamageable
         if (_health <= 0) Die();
     }
 
+    // защищаемся от повторного разрушения и отменяем работу механизмов двери
     public void Die()
     {
         if (_destroyed) return;
@@ -103,7 +115,7 @@ public partial class Door : Node3D, IDamageable
         _closePending = false;
         _entrySides.Clear();
         _animationPlayer.Stop();
-        // Полотно удаляется вместе с коллизиями; рама остаётся.
+        // полотно удаляется вместе с коллизиями; рама остаётся
         var hinge = GetNode<Node3D>("DoorHinge");
         DestructionEffect.Spawn(hinge);
         hinge.QueueFree();

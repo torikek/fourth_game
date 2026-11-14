@@ -1,13 +1,16 @@
 using Godot;
 
-/// <summary>Книга показывает собственный текст и остаётся в мире.</summary>
+/// книга показывает собственный текст и остаётся в мире
 public partial class Book : StaticBody3D, IReadable
 {
+    // многострочный текст книги задаётся в инспекторе
     [Export(PropertyHint.MultilineText)]
     public string Text { get; set; } = "Текст книги";
 
+    // взаимодействие с книгой открывает её текст
     public void Interact() => OpenText();
 
+    // находим игрока через общую группу и просим показать текст
     public void OpenText()
     {
         if (GetTree().GetFirstNodeInGroup("reading_host") is IReadingHost host)
@@ -16,6 +19,6 @@ public partial class Book : StaticBody3D, IReadable
 
     public void CloseText()
     {
-        // Книгу можно читать повторно.
+        // книгу можно читать повторно
     }
 }

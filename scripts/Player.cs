@@ -3,17 +3,20 @@ using Godot;
 [GlobalClass]
 public partial class Player : CharacterBody3D, IReadingHost
 {
+    // используем гравитацию проекта и настраиваемые параметры движения
     private float gravity = ProjectSettings.GetSetting("physics/3d/default_gravity").AsSingle();
     [Export]
     private float Speed = 5.0f;
     [Export]
     private float MouseSensitivity = 0.002f;
     [Export]
+    // храним идентификаторы предметов для проверки повторного подбора
     private Godot.Collections.Array<string> Inventory = new Godot.Collections.Array<string>();
 
     [Export]
     private float AttackDamage = 10.0f;
 
+    // сохраняем ссылки на камеру, луч выбора предмета и интерфейс
     private Camera3D _camera;
     private RayCast3D _rayCast;
     private Label _interactionLabel;
@@ -21,9 +24,11 @@ public partial class Player : CharacterBody3D, IReadingHost
     private IInteractable _target;
     private ReadingPanel _readingPanel;
     private Label _notesLabel;
+    // запоминаем источник текста и состояние чтения
     private IReadable _readingSource;
     private bool _isReading;
 
+    // находим узлы игрока, создаём окно чтения и захватываем курсор
     public override void _Ready()
     {
         _camera = GetNode<Camera3D>("Camera3D");
@@ -33,19 +38,24 @@ public partial class Player : CharacterBody3D, IReadingHost
         _readingPanel = GD.Load<PackedScene>("res://scenes/ReadingPanel.tscn").Instantiate<ReadingPanel>();
         AddChild(_readingPanel);
         _readingPanel.CloseRequested += CloseReading;
+        // читаемые предметы находят игрока через общую группу
         AddToGroup("reading_host");
         _notesLabel.Text = Inventory.Count.ToString();
+        // исключаем самого игрока из проверки лучом
         _rayCast.AddException(this);
         _interactionLabel.Text = "";
         Input.MouseMode = Input.MouseModeEnum.Captured;
     }
 
+    // применяем гравитацию и перемещение с учётом столкновений
     public override void _PhysicsProcess(double delta)
     {
         Vector3 velocity = Velocity;
         velocity.Y -= gravity * (float)delta;
 
+        // во время чтения отключаем движение, сохраняя действие гравитации
         Vector2 input = _isReading ? Vector2.Zero : Input.GetVector("left", "right", "forward", "backward");
+        // переводим направление ввода в систему координат повёрнутого игрока
         Vector3 movementDirection = Transform.Basis * new Vector3(input.X, 0, input.Y);
         velocity.X = movementDirection.X * Speed;
         velocity.Z = movementDirection.Z * Speed;
@@ -53,12 +63,13 @@ public partial class Player : CharacterBody3D, IReadingHost
         Velocity = velocity;
         MoveAndSlide();
     }
+    // обновляем цель взаимодействия и подсказку каждый кадр
     public override void _Process(double delta)
     {
         UpdateInteractionTarget();
     }
 
-    // Коллайдер импортированной модели может быть дочерним узлом предмета.
+    // коллайдер импортированной модели может быть дочерним узлом предмета
     private void UpdateInteractionTarget()
     {
         _target = null;
@@ -67,6 +78,7 @@ public partial class Player : CharacterBody3D, IReadingHost
         if (_isReading) return;
         _rayCast.ForceRaycastUpdate();
 
+        // поднимаемся от коллайдера к родителям в поисках доступного взаимодействия
         Node candidate = _rayCast.GetCollider() as Node;
         while (GodotObject.IsInstanceValid(candidate))
         {
@@ -89,6 +101,7 @@ public partial class Player : CharacterBody3D, IReadingHost
         }
     }
 
+    // обрабатываем чтение, обзор мышью, выход, взаимодействие и атаку
     public override void _Input(InputEvent @event)
     {
         if (_isReading)
@@ -106,6 +119,7 @@ public partial class Player : CharacterBody3D, IReadingHost
 
             _camera.RotateX(-mouseMotion.Relative.Y * MouseSensitivity);
             Vector3 cameraRotation = _camera.Rotation;
+            // ограничиваем наклон камеры, чтобы не переворачивать обзор
             cameraRotation.X = Mathf.Clamp(cameraRotation.X, Mathf.DegToRad(-70), Mathf.DegToRad(70));
             _camera.Rotation = cameraRotation;
         }
@@ -122,7 +136,7 @@ public partial class Player : CharacterBody3D, IReadingHost
             return;
         }
 
-        // Проверяем луч заново, чтобы действие соответствовало текущему прицелу.
+        // проверяем луч заново, чтобы действие соответствовало текущему прицелу
         UpdateInteractionTarget();
         if (_target == null || !GodotObject.IsInstanceValid(_targetNode)
             || _targetNode.IsQueuedForDeletion())
@@ -134,13 +148,14 @@ public partial class Player : CharacterBody3D, IReadingHost
         {
             _target.Interact();
         }
+        // наносим урон только предметам с поддержкой разрушения
         else if (attackPressed && _target is IDamageable damageable)
         {
             damageable.ReceiveDamage(AttackDamage);
         }
     }
 
-    // Окно общее, но последствия закрытия определяет читаемый предмет.
+    // окно общее, но последствия закрытия определяет читаемый предмет
     public bool ShowText(IReadable source, string text)
     {
         if (_isReading) return false;
@@ -152,6 +167,7 @@ public partial class Player : CharacterBody3D, IReadingHost
         return true;
     }
 
+    // возвращаем управление и уведомляем существующий предмет о завершении чтения
     private void CloseReading()
     {
         if (!_isReading) return;
@@ -164,6 +180,7 @@ public partial class Player : CharacterBody3D, IReadingHost
             source.CloseText();
     }
 
+    // добавляем уникальный предмет, обновляем счётчик и сбрасываем текущую цель
     public void CollectItem(ICollectible item)
     {
         if (Inventory.Contains(item.ItemId)) return;
