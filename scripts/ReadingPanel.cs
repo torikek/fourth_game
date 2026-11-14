@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-/// <summary>общее окно текста сообщает игроку о завершении чтения</summary>
+/// общее окно текста сообщает игроку о завершении чтения
 public partial class ReadingPanel : CanvasLayer
 {
     // передаём запрос закрытия игроку, который завершает чтение
