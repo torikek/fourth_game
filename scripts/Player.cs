@@ -79,7 +79,7 @@ public partial class Player : CharacterBody3D, IReadingHost
             {
                 _target = interactable;
                 _targetNode = candidate;
-                _interactionLabel.Text = candidate is Door { IsLocked: true }
+                _interactionLabel.Text = candidate is Door door && door.IsLocked
                     ? "Дверь заперта. ЛКМ — сломать дверь"
                     : $"Press 'E' to interact with {candidate.Name}";
                 return;

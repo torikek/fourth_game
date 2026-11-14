@@ -15,9 +15,16 @@ public partial class Chair : StaticBody3D, IDamageable
     public void ReceiveDamage(float damage)
     {
         if (damage <= 0 || IsQueuedForDeletion()) return;
+        ObjectSound.Hit(this);
         _health -= damage;
         if (_health <= 0) Die();
     }
 
-    public void Die() => QueueFree();
+    public void Die()
+    {
+        if (IsQueuedForDeletion()) return;
+        ObjectSound.Break(this);
+        DestructionEffect.Spawn(this);
+        QueueFree();
+    }
 }

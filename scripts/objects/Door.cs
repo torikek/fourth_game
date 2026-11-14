@@ -88,6 +88,7 @@ public partial class Door : Node3D, IDamageable
     public void ReceiveDamage(float damage)
     {
         if (_destroyed || damage <= 0) return;
+        ObjectSound.Hit(this);
         _health -= damage;
         if (_health <= 0) Die();
     }
@@ -96,12 +97,15 @@ public partial class Door : Node3D, IDamageable
     {
         if (_destroyed) return;
         _destroyed = true;
+        ObjectSound.Break(this);
         _lockOnAnimationFinished = false;
         IsLocked = false;
         _closePending = false;
         _entrySides.Clear();
         _animationPlayer.Stop();
         // Полотно удаляется вместе с коллизиями; рама остаётся.
-        GetNode<Node3D>("DoorHinge").QueueFree();
+        var hinge = GetNode<Node3D>("DoorHinge");
+        DestructionEffect.Spawn(hinge);
+        hinge.QueueFree();
     }
 }
