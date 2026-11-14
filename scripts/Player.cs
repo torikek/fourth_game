@@ -30,12 +30,14 @@ public partial class Player : CharacterBody3D
         Velocity = velocity;
         MoveAndSlide();
     }
+    private Node collider;
 
     public override void _Process(double delta)
     {
-        // Label label = GetNode<Label>("CanvasLayer/CameraLabel");
-        // RayCast3D rayCast = GetNode<RayCast3D>("Camera3D/RayCast3D");
+        Label label = GetNode<Label>("CanvasLayer/CameraLabel");
+        RayCast3D rayCast = GetNode<RayCast3D>("Camera3D/RayCast3D");
         rayCast.ForceRaycastUpdate();
+        collider = rayCast.GetCollider() as Node;
 
         label.Text = rayCast.GetCollider() is Node collider
             ? $"Press 'E' to interact with {collider.Name}"
@@ -57,6 +59,23 @@ public partial class Player : CharacterBody3D
         if (@event.IsActionPressed("quit"))
         {
             GetTree().Quit();
+        }
+        
+        if (collider != null && collider is IInteractable a)
+        {
+            GD.Print("a.Name");
+            if (@event.IsActionPressed("interact"))
+            {
+                a.Interact();
+
+            }
+            if (@event.IsActionPressed("attack"))
+            {
+                if (a is IDamageble d)
+                {
+                a.ReceiveDamage();
+                }
+            }
         }
     }
 }
